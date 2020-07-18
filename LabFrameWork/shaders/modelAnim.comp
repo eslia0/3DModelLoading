@@ -1,0 +1,49 @@
+#version 440 core
+#extension GL_ARB_compute_shader : enable
+#extension GL_ARB_shader_storage_buffer_object : enable
+
+layout( std430, binding = 2 ) buffer ssbo2
+{
+	float currentAnimFrame[ ];
+};
+
+layout( std430, binding = 3 ) buffer ssbo3
+{
+	int isAnimating[ ];
+};
+
+layout( std430, binding = 4 ) buffer ssbo4
+{
+	float animationSpeed[ ];
+};
+
+layout( std430, binding = 6 ) buffer ssbo6
+{
+	float currentTransFrame[ ];
+};
+
+// instancinig scale. Devides all data to local size.
+layout ( local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+layout( location = 1 ) uniform float animMaxFrame;
+layout( location = 2 ) uniform float transMaxFrame;
+
+void main()
+{
+	uint index = gl_GlobalInvocationID.x;
+
+	if (isAnimating[index] == 1){
+		if(currentAnimFrame[index] + animationSpeed[index] < animMaxFrame) {
+			currentAnimFrame[index] = currentAnimFrame[index] + animationSpeed[index];
+		}
+		else {
+			currentAnimFrame[index] = 0.0;
+		}
+
+		if(currentTransFrame[index] + 1.0 < transMaxFrame) {
+			currentTransFrame[index] = currentTransFrame[index] + 1;
+		}
+		else {
+			currentTransFrame[index] = 0.0;
+		}
+	}
+}
